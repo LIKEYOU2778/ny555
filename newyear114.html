@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 乙巳岁首 · 专属贺礼</title>
+    <style>
+        /* 核心变量 */
+        :root {
+            --font-song: "Source Han Serif CN", "Songti SC", "STSong", "SimSun", serif;
+            --deep-red: #800000;
+            --gold: #d4af37;
+            --soft-gold: #f1d38a;
+            
+            /* 非线性动画曲线 */
+            --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1); /* 带回弹的弹出 */
+            --ease-in-back: cubic-bezier(0.36, 0, 0.66, -0.56); /* 带压缩的收起 */
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0;
+            background: radial-gradient(circle at center, #a31515 0%, #3a0000 100%);
+            color: var(--soft-gold);
+            font-family: var(--font-song);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 顶部标题 */
+        header {
+            text-align: center;
+            padding: 80px 20px 40px;
+        }
+
+        h1 {
+            font-weight: 300;
+            font-size: 3rem;
+            margin: 0;
+            letter-spacing: 1.2rem;
+            text-indent: 1.2rem;
+            color: var(--gold);
+        }
+
+        .sub-title {
+            font-size: 1rem;
+            margin-top: 15px;
+            letter-spacing: 0.8rem;
+            text-indent: 0.8rem;
+            opacity: 0.6;
+        }
+
+        /* 名字矩阵 */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 20px;
+            padding: 40px;
+        }
+
+        .name-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 0.5px solid rgba(212, 175, 55, 0.2);
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .name-card:hover {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: var(--gold);
+            transform: translateY(-5px);
+        }
+
+        .name-card span {
+            font-size: 1.3rem;
+            letter-spacing: 0.3rem;
+            text-indent: 0.3rem;
+        }
+
+        /* --- 弹窗核心动效 --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            
+            /* 默认状态：隐藏 */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .modal-content {
+            width: 85%;
+            max-width: 420px;
+            background: var(--deep-red);
+            border: 1px solid var(--gold);
+            padding: 60px 30px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+
+            /* 默认状态：缩小并向下偏移 */
+            transform: scale(0.6) translateY(40px);
+            transition: transform 0.6s var(--ease-in-back); /* 默认用收起的曲线 */
+        }
+
+        /* 激活状态 */
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1) translateY(0);
+            transition: transform 0.7s var(--ease-out-back); /* 弹出用回弹的曲线 */
+        }
+
+        .modal-name {
+            font-size: 2.8rem;
+            color: var(--gold);
+            margin-bottom: 25px;
+            font-weight: 300;
+            letter-spacing: 0.8rem;
+            text-indent: 0.8rem;
+        }
+
+        .modal-text {
+            font-size: 1.2rem;
+            line-height: 2;
+            color: var(--soft-gold);
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .close-btn {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 10px 40px;
+            font-family: var(--font-song);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            background: var(--gold);
+            color: var(--deep-red);
+        }
+
+        /* 装饰花纹 */
+        .deco { position: absolute; width: 15px; height: 15px; border: 1px solid var(--gold); }
+        .tl { top: 15px; left: 15px; border-right: 0; border-bottom: 0; }
+        .br { bottom: 15px; right: 15px; border-left: 0; border-top: 0; }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; letter-spacing: 0.5rem; }
+            .container { grid-template-columns: repeat(2, 1fr); padding: 20px; }
+            .modal-content { padding: 40px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>二零二六·新年祝福</h1>
+        <div class="sub-title">一人一词 · 见字如晤</div>
+    </header>
+
+    <div class="container" id="grid"></div>
+
+    <div class="modal-overlay" id="overlay">
+        <div class="modal-content">
+            <div class="deco tl"></div>
+            <div class="deco br"></div>
+            <div class="modal-name" id="mName"></div>
+            <div class="modal-text" id="mWish"></div>
+            <button class="close-btn" onclick="closeModal()">阖上卡片</button>
+        </div>
+    </div>
+
+    <script>
+        const names = [
+            "曾贤祖", "曾胤", "陈柏材", "陈皓", "陈俊达", "程子洋", "高子强", "胡兆宇", "黎晓峰", "李耀俊",
+            "李涌豪", "梁浩杨", "刘炫均", "罗楚诚", "庞国涛", "容杰信", "容日朗", "容泽朗", "覃利咏", "谭朗",
+            "汪林涛", "冼宗洲", "谢宇浩", "叶孟泽", "张腾宇", "赵智富", "朱智轩", "陈可颖", "陈婷欣", "陈悦文",
+            "陈梓晴", "高慧雅", "胡嘉怡", "胡咏儿", "黎楚柔", "黎嘉慧", "黎颖琳", "李海琳", "李嘉琪", "李雨嫣",
+            "林祉君", "刘沛霖", "罗桂丽", "骆巧诗", "容嘉柔", "容乐儿", "容佩莹", "唐婉滢", "伍雨馨", "许芷菡",
+            "张诗颖", "张梓欣"
+        ];
+
+        // 52条专属祝福（对应名字）
+        const wishes = [
+            "祖辈荣光在，贤才出少年！愿你2025年如松柏之茂，前程似锦！",
+            "胤续繁昌，岁岁平安！愿你在新的一年里，万事顺遂，心想事成！",
+            "柏木长青，材华横溢！愿你如松柏般坚定向上，立于时代之巅！",
+            "皓月长空，志向高远！愿你的前途如月华般皎洁，一片光明！",
+            "俊杰识时务，达人知命途！祝你学业节节高升，事业有成！",
+            "子衿青青，洋洋洒洒！愿你心中有梦，脚下有路，不负韶华！",
+            "子睿且强，志在高峰！愿你克服万难，终抵人生的巅峰境界！",
+            "兆瑞之光，宇内芬芳！愿你的世界永远充满阳光与祥和！",
+            "晓见晨曦，峰峦叠翠！祝你新年有新突破，登高望远！",
+            "耀眼夺目，俊才卓越！愿你的人生舞台熠熠生辉，光彩万丈！",
+            "涌流豪迈，壮志凌云！愿你乘风破浪，于时代的潮头勇往直前！",
+            "浩气凛然，杨帆远航！愿你2025年扬帆起航，直抵彼岸！",
+            "炫目如火，均衡有道！愿你生活灿烂如霞，内心淡定如水！",
+            "楚地英才，诚挚如初！愿你坚守初心，在喧嚣中守住纯真！",
+            "国之栋梁，涛声依旧！愿你以后的每一天都壮志昂扬！",
+            "杰出自信，信守承诺！愿你在新的一年里成就非凡，不负众望！",
+            "日升之朗，照亮坦途！愿你眼里长着太阳，笑里全是坦荡！",
+            "泽润万物，朗照乾坤！愿你的人生如水灵动，如月明亮！",
+            "利在千秋，咏赞芳华！愿你的才干得到展现，留下无悔诗篇！",
+            "谭思敏捷，朗朗乾坤！愿你思维开阔，智慧如泉，照亮前路！",
+            "林间清泉，涛声阵阵！愿你的生活充满诗意，不被琐事所累！",
+            "宗师风范，洲际扬名！愿你的才华如星辰耀眼，走向世界！",
+            "宇内杰出，浩气长存！愿你勇敢追求属于自己的星辰大海！",
+            "孟春之泽，温润如玉！祝你在新的一年里平安喜乐，谦谦有礼！",
+            "腾飞九霄，宇内称雄！愿你新春大吉，如鹏鸟展翅，志向万里！",
+            "智勇双全，富裕充盈！祝你2025年精神丰盈，物质美满！",
+            "智者不惑，轩昂气宇！愿你的人生如画，每一笔都惊艳时光！",
+            "可人温婉，颖悟绝伦！愿你才貌双全，在未来日子里灼灼生辉！",
+            "婷婷玉立，欣欣向荣！愿你的笑容永远如花灿烂，温暖如春！",
+            "悦心自然，文质彬彬！愿你的生活充满雅致，如清风拂面！",
+            "梓里之光，晴空万里！祝你的人生永远如正午天色，灿烂明净！",
+            "慧质兰心，雅致大方！愿你活成自己最喜欢的样子，优雅坚定！",
+            "嘉言善行，怡然自得！愿你每一刻都过得舒心愉快，随性自适！",
+            "咏志抒怀，儿女情长！愿你的梦想在新的一年里生根发芽！",
+            "楚楚动人，温柔如水！愿你被这个世界温柔以待，岁岁无忧！",
+            "嘉才卓识，慧心如镜！愿你生活幸福，在复杂世界保持清澈！",
+            "颖慧绝伦，琳琅满目！愿你的人生布满惊喜，如宝库般丰富！",
+            "海纳百川，琳悦人心！愿你的胸怀如大海广阔，纳百福于一身！",
+            "嘉勉自我，琪瑰如珍！愿你像珍珠一样，磨砺后愈发闪耀！",
+            "雨润万物，嫣然一笑！愿你的笑容是春天里最温柔的那抹春色！",
+            "祉禄双全，君子之风！愿你一生平安，福德圆满，风骨长存！",
+            "沛然莫御，霖润无声！愿你的付出都有丰厚回报，润物无声！",
+            "桂馥兰香，丽质天成！愿你的生活充满芬芳，每一步都踏在花期！",
+            "巧思如泉，诗意人生！愿你的生活如诗如画，处处皆风景！",
+            "嘉奖不断，柔情似水！愿你被所有的爱包围，被时光偏爱！",
+            "乐在其中，儿时童心！愿你永远保持那份纯真，笑容从未改变！",
+            "佩戴荣光，莹亮如星！愿你的人生璀璨夺目，不惧任何黑暗！",
+            "婉约动人，滢澈透明！愿你的心灵永远纯净，如泉水般甘甜！",
+            "雨后馨香，沁人心脾！愿你的生活充满甜美，不仅有雨亦有晴！",
+            "芷兰芬芳，菡萏舒展！愿你如花般静静绽放，在岁月里优雅生长！",
+            "诗情画意，颖悟非凡！愿你的才华惊艳所有人，活得诗意盎然！",
+            "梓木成材，欣欣向荣！愿你学业有成，未来如森林般繁茂兴旺！"
+        ];
+
+        const grid = document.getElementById('grid');
+        const overlay = document.getElementById('overlay');
+
+        // 初始化
+        names.forEach((name, i) => {
+            const card = document.createElement('div');
+            card.className = 'name-card';
+            card.innerHTML = `<span>${name}</span>`;
+            card.onclick = () => openModal(name, wishes[i]);
+            grid.appendChild(card);
+        });
+
+        function openModal(name, wish) {
+            document.getElementById('mName').innerText = name;
+            document.getElementById('mWish').innerText = wish;
+            overlay.classList.add('active');
+        }
+
+        function closeModal() {
+            overlay.classList.remove('active');
+        }
+
+        // 点击背景也可关闭
+        overlay.onclick = (e) => {
+            if(e.target === overlay) closeModal();
+        }
+    </script>
+</body>
+</html>
